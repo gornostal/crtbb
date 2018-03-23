@@ -17,3 +17,12 @@ Change mnemonic in `ethereum/truffle.js` to yours and run
 ```
 ./truffle.sh deploy --network ropsten
 ```
+
+
+# Build for Github Pages
+
+Add this line to `package.json`
+```
+"homepage": "https://gornostal.github.io/demo-dapps",
+```
+Then run `yarn build` and `cp -r build/* docs`
