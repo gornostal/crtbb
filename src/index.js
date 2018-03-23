@@ -1,8 +1,9 @@
 import "bootstrap/dist/css/bootstrap.css"
+import "font-awesome/css/font-awesome.css"
 
 import React from "react"
 import ReactDOM from "react-dom"
-import { Provider } from 'react-redux'
+import { Provider } from "react-redux"
 import { applyMiddleware, createStore } from "redux"
 import promiseMiddleware from "redux-promise-middleware"
 import { composeWithDevTools } from "redux-devtools-extension"

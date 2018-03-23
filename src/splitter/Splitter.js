@@ -29,7 +29,7 @@ class Splitter extends Component {
   render() {
     const { handleSubmit, submitting, submitSucceeded, accounts } = this.props
     const accountOptions = accounts.payload ? accounts.payload.map(i => ({ value: i, displayValue: i })) : []
-    accountOptions.unshift({ value: "", displayValue: "(Not selected)" })
+    accountOptions.unshift({ value: "", displayValue: "(not selected)" })
     var error = this.props.error
     if (accounts.error) {
       error = "Could not load your accounts. Did you install Metamask browser extension?"
@@ -72,6 +72,11 @@ class Splitter extends Component {
           <FormInput name="address1" type="text" label="Address 1" />
           <FormInput name="address2" type="text" label="Address 2" />
           <Button className="btn-lg" bsStyle="success" type="submit" disabled={submitting}>
+            {submitting && (
+              <span>
+                <i className="fa fa-spinner fa-spin" />&nbsp;
+              </span>
+            )}
             Submit
           </Button>
         </form>

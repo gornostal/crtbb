@@ -10,7 +10,7 @@ export default function makeFormSubmitHandler(asyncFn) {
         throw e
       }
 
-      let error = e + ""
+      let error = e.message || e + ""
       let errors = {}
       if (e.status === 500) {
         error = "Internal server error occurred. Please try again later."
