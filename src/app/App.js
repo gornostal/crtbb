@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { BrowserRouter, Route, Switch } from "react-router-dom"
+import { HashRouter, Route, Switch } from "react-router-dom"
 import Helmet from "react-helmet"
 
 import Landing from "../layout/Landing"
@@ -9,7 +9,7 @@ import About from "../about/About"
 class App extends Component {
   render() {
     return (
-      <BrowserRouter>
+      <HashRouter>
         <Landing>
           <Helmet titleTemplate="%s &mdash; Demo ÐApps" />
           <Switch>
@@ -17,7 +17,7 @@ class App extends Component {
             <Route path="/about" exact component={About} />
           </Switch>
         </Landing>
-      </BrowserRouter>
+      </HashRouter>
     )
   }
 }
