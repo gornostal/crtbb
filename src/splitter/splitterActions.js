@@ -1,18 +1,13 @@
 import { combineReducers } from "redux"
 import makeTypesActionsReducer from "../utils/makeTypesActionsReducer"
+import { getAccounts } from "./splitterApi"
 
-function sendMoney(ethValue, address1, address2) {
-  return new Promise(resolve => {
-    setTimeout(resolve, 1e3)
-  })
-}
-
-const { actions: sendMoneyActions, reducer: send } = makeTypesActionsReducer("SPLITTER/SEND", sendMoney)
+const { actions: getAccountsActions, reducer: accounts } = makeTypesActionsReducer("SPLITTER/ACCOUNTS", getAccounts)
 
 export const actions = {
-  sendMoney: sendMoneyActions
+  getAccounts: getAccountsActions.asyncRequest
 }
 
 export const reducer = combineReducers({
-  send
+  accounts
 })

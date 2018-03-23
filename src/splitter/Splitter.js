@@ -1,15 +1,16 @@
 import React, { Component } from "react"
 import { Alert, Button } from "react-bootstrap"
+import { compose, bindActionCreators } from "redux"
 import Helmet from "react-helmet"
-import { compose } from "redux"
 import { connect } from "react-redux"
 import { reduxForm } from "redux-form"
 import { withRouter } from "react-router-dom"
 
 import makeFormSubmitHandler from "../utils/makeFormSubmitHandler"
-import { FormInput } from "../layout/FormInput"
+import { FormInput, FormSelect } from "../layout/FormInput"
 
 import { split } from "./splitterApi"
+import { actions } from "./splitterActions"
 
 class Splitter extends Component {
   constructor(props) {
@@ -17,12 +18,25 @@ class Splitter extends Component {
     this.onSubmit = this.onSubmit.bind(this)
   }
 
+  componentDidMount() {
+    this.props.actions.getAccounts()
+  }
+
   async onSubmit(data) {
     return await this.props.split(data.ethValue, data.account1, data.account2)
   }
 
   render() {
-    const { handleSubmit, error, submitting, submitSucceeded } = this.props
+    const { handleSubmit, submitting, submitSucceeded, accounts } = this.props
+    const accountOptions = accounts.payload ? accounts.payload.map(i => ({ value: i, displayValue: i })) : []
+    var error = this.props.error
+    if (accounts.error) {
+      error = "Could not load your accounts. Did you install Metamask browser extension?"
+    }
+    if (accounts.payload && accounts.payload.length === 0) {
+      error = "Could not load your accounts. Did you unlock Metamask?"
+    }
+
     return (
       <div className="jumbotron">
         <Helmet>
@@ -32,7 +46,7 @@ class Splitter extends Component {
         <h2>Enter two addresses</h2>
         <h3>and you will split sent Ether among them</h3>
 
-        <br/>
+        <br />
 
         {error && (
           <Alert bsStyle="warning">
@@ -47,6 +61,12 @@ class Splitter extends Component {
         )}
 
         <form className="form-horizontal" onSubmit={handleSubmit(this.onSubmit)}>
+          <FormSelect
+            name="from"
+            label="From"
+            disabled={!accounts.payload || accounts.payload.length === 0}
+            options={accountOptions}
+          />
           <FormInput name="ethValue" type="text" label="ETH" />
           <FormInput name="address1" type="text" label="Address 1" />
           <FormInput name="address2" type="text" label="Address 2" />
@@ -61,7 +81,15 @@ class Splitter extends Component {
 
 const mapStateToProps = state => ({
   initialValues: {},
-  split: makeFormSubmitHandler(split)
+  formValues: (state.form.splitter && state.form.splitter.values) || {},
+  split: makeFormSubmitHandler(split),
+  accounts: state.splitter.accounts
 })
 
-export default compose(withRouter, connect(mapStateToProps), reduxForm({ form: "splitter" }))(Splitter)
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(actions, dispatch)
+})
+
+export default compose(withRouter, connect(mapStateToProps, mapDispatchToProps), reduxForm({ form: "splitter" }))(
+  Splitter
+)
