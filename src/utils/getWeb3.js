@@ -20,13 +20,13 @@ const getWeb3 = () => {
 
         console.log("Injected web3 detected.")
       } else {
-        // Fallback to localhost if no web3 injection. We've configured this to
-        // use the development console's port by default.
-        var provider = new Web3.providers.HttpProvider(process.env.REACT_DEV_WEB3_PROVIDER)
+        // Fallback to localhost if no web3 injection
+        // Run "./truffle.sh develop" to start a test node and JSON RPC
+        var provider = new Web3.providers.HttpProvider(process.env.REACT_APP_DEV_WEB3_PROVIDER)
 
         cachedWeb3 = new Web3(provider)
 
-        console.log("No web3 instance injected, using Local web3.")
+        console.log(`No web3 instance injected, using Local web3 at ${process.env.REACT_APP_DEV_WEB3_PROVIDER}`)
       }
 
       resolve(cachedWeb3)

@@ -23,12 +23,13 @@ class Splitter extends Component {
   }
 
   async onSubmit(data) {
-    return await this.props.split(data.ethValue, data.account1, data.account2)
+    return await this.props.split(data.fromAccount, data.ethValue, data.address1, data.address2)
   }
 
   render() {
     const { handleSubmit, submitting, submitSucceeded, accounts } = this.props
     const accountOptions = accounts.payload ? accounts.payload.map(i => ({ value: i, displayValue: i })) : []
+    accountOptions.unshift({ value: "", displayValue: "(Not selected)" })
     var error = this.props.error
     if (accounts.error) {
       error = "Could not load your accounts. Did you install Metamask browser extension?"
@@ -62,7 +63,7 @@ class Splitter extends Component {
 
         <form className="form-horizontal" onSubmit={handleSubmit(this.onSubmit)}>
           <FormSelect
-            name="from"
+            name="fromAccount"
             label="From"
             disabled={!accounts.payload || accounts.payload.length === 0}
             options={accountOptions}

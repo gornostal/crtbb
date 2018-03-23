@@ -11,7 +11,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Landing>
-          <Helmet titleTemplate="%s &mdash; Splitter" />
+          <Helmet titleTemplate="%s &mdash; Demo ÐApps" />
           <Switch>
             <Route path="/" exact component={Splitter} />
             <Route path="/about" exact component={About} />

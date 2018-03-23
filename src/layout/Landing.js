@@ -15,7 +15,7 @@ const Landing = ({ children }) => (
           About
         </NavLink>
       </Nav>
-      <h3 className="text-muted">Splitter App</h3>
+      <h3 className="text-muted">Demo ÐApps</h3>
     </div>
 
     {children}
