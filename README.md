@@ -21,8 +21,11 @@ Change mnemonic in `ethereum/truffle.js` to yours and run
 
 # Build for Github Pages
 
-Add this line to `package.json`
 ```
-"homepage": "https://gornostal.github.io/demo-dapps",
+yarn build
+cp -r build/* docs
+
+git add -A
+git commit
+git push origin master
 ```
-Then run `yarn build` and `cp -r build/* docs`

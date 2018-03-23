@@ -1,5 +1,5 @@
 import React from "react"
-import { Nav } from "react-bootstrap"
+import { Nav, NavItem } from "react-bootstrap"
 
 import NavLink from "./NavLink"
 import "./jumbotron-narrow.css"
@@ -14,6 +14,9 @@ const Landing = ({ children }) => (
         <NavLink exact to="/about">
           About
         </NavLink>
+        <NavItem href="https://github.com/gornostal/demo-dapps">
+          <i className="fa fa-github" /> Github
+        </NavItem>
       </Nav>
       <h3 className="text-muted">Demo ÐApps</h3>
     </div>
