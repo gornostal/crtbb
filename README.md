@@ -1,17 +1,14 @@
-# Development
-```
-# install deps
-yarn install
-# start ETH development node and JSON RPC server
-./truffle develop
-# deploy contract
-./truffle.sh deploy --network development
-# start webserver
-yarn start
-# Open http://localhost:3000/ in a browser
-```
+# Demo ÐApps made with Truffle, Web3, Create React App, Redux, React-Bootstrap
 
-# Deploy to Ropsten
+## Development
+
+1. Install deps `yarn install`
+1. Start ETH development node and JSON RPC server `./truffle.sh develop`
+1. Deploy contract `./truffle.sh deploy --network development`
+1. Start Webserver `yarn start`
+1. Open http://localhost:3000/ in a browser
+
+## Deploy to Ropsten
 
 Change mnemonic in `ethereum/truffle.js` to yours and run
 ```
@@ -19,7 +16,7 @@ Change mnemonic in `ethereum/truffle.js` to yours and run
 ```
 
 
-# Build for Github Pages
+## Build for Github Pages
 
 ```
 yarn build
