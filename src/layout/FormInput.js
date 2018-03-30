@@ -1,14 +1,33 @@
 import React from 'react'
-import { FormGroup, HelpBlock, ControlLabel, FormControl } from 'react-bootstrap'
+import { FormGroup, InputGroup, HelpBlock, ControlLabel, FormControl } from 'react-bootstrap'
 import { Field } from 'redux-form'
 
 const parseNumber = value => Number(value)
 
-const BootstrapFormInput = ({ input, label, value, meta, onChange, type, required }) => (
+const BootstrapFormInput = ({
+  input,
+  label,
+  value,
+  meta,
+  onChange,
+  type,
+  required,
+  placeholder,
+  addonBefore,
+  addonAfter
+}) => (
   <FormGroup validationState={meta.error && 'error'} className={required && 'required'}>
     <ControlLabel className="col-sm-2">{label}</ControlLabel>
     <div className="col-sm-10">
-      <FormControl value={input.value} onChange={input.onChange} type={type} />
+      {addonBefore || addonAfter ? (
+        <InputGroup>
+          {addonBefore && <InputGroup.Addon>{addonBefore}</InputGroup.Addon>}
+          <FormControl value={input.value} onChange={input.onChange} type={type} placeholder={placeholder} />
+          {addonAfter && <InputGroup.Addon>{addonAfter}</InputGroup.Addon>}
+        </InputGroup>
+      ) : (
+        <FormControl value={input.value} onChange={input.onChange} type={type} placeholder={placeholder} />
+      )}
       <FormControl.Feedback />
       <HelpBlock>{meta.error}</HelpBlock>
     </div>

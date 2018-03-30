@@ -49,6 +49,8 @@ body {
 .jumbotron h2,
 .jumbotron h3 {
   text-align: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 .jumbotron .btn {
   padding: 14px 24px;
@@ -61,6 +63,11 @@ body {
 }
 .marketing p + h4 {
   margin-top: 28px;
+}
+
+/* Helper classes */
+.align-center {
+  text-align: center;
 }
 
 /* Responsive: Portrait tablets and up */

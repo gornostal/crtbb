@@ -1,0 +1,10 @@
+.rps-input__button-group .btn svg {
+  color: #848282;
+  font-size: 300%;
+}
+.rps-input__button-group .btn:focus {
+  outline: none;
+}
+.rps-input__button-group .btn:focus svg {
+  color: #6a6868;
+}
