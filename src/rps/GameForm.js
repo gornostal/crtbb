@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
 import { Alert, Button } from 'react-bootstrap'
-import { compose, bindActionCreators } from 'redux'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 import { withRouter } from 'react-router-dom'
 
 import { FormInput, FormSelect } from '../layout/FormInput'
 import makeFormSubmitHandler from '../utils/makeFormSubmitHandler'
+import withAsyncData from '../utils/withAsyncData'
 
-import { startGame, joinGame } from './rpsApi'
-import { actions } from './rpsActions'
+import { getAccounts, startGame, joinGame } from './rpsApi'
 import RpsInput from './RpsInput'
 
 class GameForm extends Component {
@@ -19,7 +19,7 @@ class GameForm extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.getAccounts()
+    this.props.ethAccounts.load()
   }
 
   async onSubmit(formData) {
@@ -31,14 +31,14 @@ class GameForm extends Component {
   }
 
   render() {
-    const { handleSubmit, submitting, submitSucceeded, accounts } = this.props
-    const accountOptions = accounts.payload ? accounts.payload.map(i => ({ value: i, displayValue: i })) : []
+    const { handleSubmit, submitting, submitSucceeded, ethAccounts } = this.props
+    const accountOptions = ethAccounts.data ? ethAccounts.data.map(i => ({ value: i, displayValue: i })) : []
     accountOptions.unshift({ value: '', displayValue: '(not selected)' })
     var error = this.props.error
-    if (accounts.error) {
+    if (ethAccounts.error) {
       error = 'Could not load your accounts. Did you install Metamask browser extension?'
     }
-    if (accounts.payload && accounts.payload.length === 0) {
+    if (ethAccounts.data && ethAccounts.data.length === 0) {
       error = 'Could not load your accounts. Did you unlock Metamask?'
     }
 
@@ -61,7 +61,7 @@ class GameForm extends Component {
           <FormSelect
             name="fromAccount"
             label="Address"
-            disabled={!accounts.payload || accounts.payload.length === 0}
+            disabled={!ethAccounts.data || ethAccounts.data.length === 0}
             options={accountOptions}
           />
           <FormInput name="bet" type="text" label="Your Bet" addonAfter="ETH" />
@@ -87,14 +87,12 @@ const mapStateToProps = state => ({
   initialValues: {},
   formValues: (state.form.rps && state.form.rps.values) || {},
   startGame: makeFormSubmitHandler(startGame),
-  joinGame: makeFormSubmitHandler(joinGame),
-  accounts: state.rps.accounts
+  joinGame: makeFormSubmitHandler(joinGame)
 })
 
-const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(actions, dispatch)
-})
-
-export default compose(withRouter, connect(mapStateToProps, mapDispatchToProps), reduxForm({ form: 'GameForm' }))(
-  GameForm
-)
+export default compose(
+  withRouter,
+  withAsyncData('ethAccounts', getAccounts),
+  connect(mapStateToProps),
+  reduxForm({ form: 'GameForm' })
+)(GameForm)
