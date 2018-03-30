@@ -1,5 +1,5 @@
-import React, { Component } from "react"
-import { Link, withRouter, matchPath } from "react-router-dom"
+import React, { Component } from 'react'
+import { Link, withRouter, matchPath } from 'react-router-dom'
 
 class NavLink extends Component {
   render() {
@@ -7,7 +7,7 @@ class NavLink extends Component {
       path: this.props.to,
       exact: this.props.exact
     })
-    const className = isActive ? "active" : ""
+    const className = isActive ? 'active' : ''
     const linkProps = {
       title: this.props.title,
       to: this.props.to,

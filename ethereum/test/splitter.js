@@ -1,60 +1,60 @@
 /* global artifacts, contract, assert, web3 */
-var Splitter = artifacts.require("Splitter.sol")
+var Splitter = artifacts.require('Splitter.sol')
 
-contract("Splitter", accounts => {
-  it("should be deployed with owner == accounts[0]", async () => {
+contract('Splitter', accounts => {
+  it('should be deployed with owner == accounts[0]', async () => {
     const splitter = await Splitter.deployed()
     const owner = await splitter.owner.call()
     assert.equal(owner, accounts[0], "Contract wasn't deployed correctly")
   })
 
-  it("fails due to zero amount", async () => {
+  it('fails due to zero amount', async () => {
     const splitter = await Splitter.new()
     try {
       await splitter.pay(accounts[1], accounts[2], { from: accounts[0], value: 0 })
     } catch (e) {
-      if (e.message.indexOf("revert") > -1) {
+      if (e.message.indexOf('revert') > -1) {
         return
       } else {
         assert.fail(null, null, `Expected 'revert' exception, got "${e.message}"`)
       }
     }
-    assert.fail(null, null, "Expected exception not received")
+    assert.fail(null, null, 'Expected exception not received')
   })
 
-  it("fails due to non-unique participant addresses", async () => {
+  it('fails due to non-unique participant addresses', async () => {
     const splitter = await Splitter.new()
     try {
-      await splitter.pay(accounts[1], accounts[2], { from: accounts[1], value: web3.toWei(2, "ether") })
+      await splitter.pay(accounts[1], accounts[2], { from: accounts[1], value: web3.toWei(2, 'ether') })
     } catch (e) {
-      if (e.message.indexOf("revert") > -1) {
+      if (e.message.indexOf('revert') > -1) {
         return
       } else {
         assert.fail(null, null, `Expected 'revert' exception, got "${e.message}"`)
       }
     }
-    assert.fail(null, null, "Expected exception not received")
+    assert.fail(null, null, 'Expected exception not received')
   })
 
-  it("should return status 0x01 when payment is successful", async () => {
+  it('should return status 0x01 when payment is successful', async () => {
     const splitter = await Splitter.new()
-    const tx = await splitter.pay(accounts[1], accounts[2], { from: accounts[0], value: web3.toWei(2, "ether") })
-    assert.equal(parseInt(tx.receipt.status, 16), 1, "Payment failed")
+    const tx = await splitter.pay(accounts[1], accounts[2], { from: accounts[0], value: web3.toWei(2, 'ether') })
+    assert.equal(parseInt(tx.receipt.status, 16), 1, 'Payment failed')
   })
 
-  it("splits 2 ether and pays 1 ether to account accounts[2]", async () => {
+  it('splits 2 ether and pays 1 ether to account accounts[2]', async () => {
     const splitter = await Splitter.new()
-    const initialBalance = web3.fromWei(await web3.eth.getBalance(accounts[2]), "ether")
-    await splitter.pay(accounts[1], accounts[2], { from: accounts[0], value: web3.toWei(2, "ether") })
-    const newBalance = web3.fromWei(await web3.eth.getBalance(accounts[2]), "ether")
-    assert.equal(newBalance - initialBalance, 1, "Incorrect amount transfered")
+    const initialBalance = web3.fromWei(await web3.eth.getBalance(accounts[2]), 'ether')
+    await splitter.pay(accounts[1], accounts[2], { from: accounts[0], value: web3.toWei(2, 'ether') })
+    const newBalance = web3.fromWei(await web3.eth.getBalance(accounts[2]), 'ether')
+    assert.equal(newBalance - initialBalance, 1, 'Incorrect amount transfered')
   })
 
-  it("splits 15 ether and pays 7.5 ether to account accounts[1]", async () => {
+  it('splits 15 ether and pays 7.5 ether to account accounts[1]', async () => {
     const splitter = await Splitter.new()
-    const initialBalance = web3.fromWei(await web3.eth.getBalance(accounts[1]), "ether")
-    await splitter.pay(accounts[1], accounts[2], { from: accounts[0], value: web3.toWei(15, "ether") })
-    const newBalance = web3.fromWei(await web3.eth.getBalance(accounts[1]), "ether")
-    assert.equal(newBalance - initialBalance, 7.5, "Incorrect amount transfered")
+    const initialBalance = web3.fromWei(await web3.eth.getBalance(accounts[1]), 'ether')
+    await splitter.pay(accounts[1], accounts[2], { from: accounts[0], value: web3.toWei(15, 'ether') })
+    const newBalance = web3.fromWei(await web3.eth.getBalance(accounts[1]), 'ether')
+    assert.equal(newBalance - initialBalance, 7.5, 'Incorrect amount transfered')
   })
 })
