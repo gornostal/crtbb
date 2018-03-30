@@ -3,8 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome": "^1.1.5",
+    "@fortawesome/fontawesome-free-brands": "^5.0.9",
+    "@fortawesome/fontawesome-free-solid": "^5.0.9",
+    "@fortawesome/react-fontawesome": "^0.0.18",
+    "add": "^2.0.6",
     "bootstrap": "^3.0.0",
-    "font-awesome": "^4.7.0",
     "react": "^16.2.0",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.2.0",
@@ -17,7 +21,8 @@
     "redux-form": "^7.3.0",
     "redux-promise-middleware": "^5.0.0",
     "truffle-contract": "^3.0.4",
-    "web3": "^1.0.0-beta.33"
+    "web3": "^1.0.0-beta.33",
+    "yarn": "^1.5.1"
   },
   "homepage": "https://gornostal.github.io/demo-dapps",
   "scripts": {
