@@ -1,4 +1,4 @@
-import Web3 from "web3"
+import Web3 from 'web3'
 
 var cachedWeb3 = null
 
@@ -10,15 +10,15 @@ const getWeb3 = () => {
     }
 
     // Wait for loading completion to avoid race conditions with web3 injection timing.
-    window.addEventListener("load", function() {
+    window.addEventListener('load', function() {
       var web3 = window.web3
 
       // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-      if (typeof web3 !== "undefined") {
+      if (typeof web3 !== 'undefined') {
         // Use Mist/MetaMask's provider.
         cachedWeb3 = new Web3(web3.currentProvider)
 
-        console.log("Injected web3 detected.")
+        console.log('Injected web3 detected.')
       } else {
         // Fallback to localhost if no web3 injection
         // Run "./truffle.sh develop" to start a test node and JSON RPC

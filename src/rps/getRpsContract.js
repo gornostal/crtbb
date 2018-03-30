@@ -1,10 +1,10 @@
 import contract from 'truffle-contract'
 
-import SplitterContract from '../contracts/Splitter.json'
+import RpsContract from '../contracts/Rps.json'
 import getWeb3 from '../utils/getWeb3'
 
-const getSplitterContract = async () => {
-  const splitter = contract(SplitterContract)
+const getRpsContract = async () => {
+  const splitter = contract(RpsContract)
   const web3 = await getWeb3()
   splitter.setProvider(web3.currentProvider)
 
@@ -19,4 +19,4 @@ const getSplitterContract = async () => {
   return await splitter.deployed()
 }
 
-export default getSplitterContract
+export default getRpsContract

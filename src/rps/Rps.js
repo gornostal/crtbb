@@ -6,13 +6,11 @@ import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 import { withRouter } from 'react-router-dom'
 
-import makeFormSubmitHandler from '../utils/makeFormSubmitHandler'
 import { FormInput, FormSelect } from '../layout/FormInput'
 
-import { split } from './splitterApi'
-import { actions } from './splitterActions'
+import { actions } from './rpsActions'
 
-class Splitter extends Component {
+class Rps extends Component {
   constructor(props) {
     super(props)
     this.onSubmit = this.onSubmit.bind(this)
@@ -22,9 +20,7 @@ class Splitter extends Component {
     this.props.actions.getAccounts()
   }
 
-  async onSubmit(data) {
-    return await this.props.split(data.fromAccount, data.ethValue, data.address1, data.address2)
-  }
+  async onSubmit(data) {}
 
   render() {
     const { handleSubmit, submitting, submitSucceeded, accounts } = this.props
@@ -41,11 +37,10 @@ class Splitter extends Component {
     return (
       <div className="jumbotron">
         <Helmet>
-          <title>Splitter</title>
+          <title>Rock-Paper-Scissors</title>
         </Helmet>
 
-        <h2>Enter two Ropsten addresses</h2>
-        <h3>and you will split sent Ether among them</h3>
+        <h2>Rock-Paper-Scissors</h2>
 
         <br />
 
@@ -87,15 +82,12 @@ class Splitter extends Component {
 
 const mapStateToProps = state => ({
   initialValues: {},
-  formValues: (state.form.splitter && state.form.splitter.values) || {},
-  split: makeFormSubmitHandler(split),
-  accounts: state.splitter.accounts
+  formValues: (state.form.rps && state.form.rps.values) || {},
+  accounts: state.rps.accounts
 })
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)
 })
 
-export default compose(withRouter, connect(mapStateToProps, mapDispatchToProps), reduxForm({ form: 'splitter' }))(
-  Splitter
-)
+export default compose(withRouter, connect(mapStateToProps, mapDispatchToProps), reduxForm({ form: 'rps' }))(Rps)

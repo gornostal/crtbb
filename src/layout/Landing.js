@@ -1,14 +1,17 @@
-import React from "react"
-import { Nav, NavItem } from "react-bootstrap"
+import React from 'react'
+import { Nav, NavItem } from 'react-bootstrap'
 
-import NavLink from "./NavLink"
-import "./jumbotron-narrow.css"
+import NavLink from './NavLink'
+import './jumbotron-narrow.css'
 
 const Landing = ({ children }) => (
   <div className="container">
     <div className="header clearfix">
       <Nav bsStyle="pills" className="pull-right">
         <NavLink exact to="/">
+          Rock-Paper-Scissors
+        </NavLink>
+        <NavLink exact to="/splitter">
           Splitter
         </NavLink>
         <NavLink exact to="/about">
