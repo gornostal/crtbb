@@ -5,7 +5,7 @@ import getWeb3 from '../utils/getWeb3'
 
 const getRpsContract = async () => {
   const rps = contract(RpsContract)
-  const web3 = await getWeb3()
+  const web3 = getWeb3()
   rps.setProvider(web3.currentProvider)
 
   // dirty hack for web3@1.0.0 support for localhost testrpc,

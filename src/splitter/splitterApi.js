@@ -22,7 +22,7 @@ export const split = async (fromAccount, ethValue, address1, address2) => {
   }
 
   const splitter = await getSplitterContract()
-  const web3 = await getWeb3()
+  const web3 = getWeb3()
   const tx = await splitter.pay(address1, address2, {
     from: fromAccount,
     value: web3.utils.toWei(ethValue, 'ether')
@@ -34,6 +34,6 @@ export const split = async (fromAccount, ethValue, address1, address2) => {
 }
 
 export const getAccounts = async () => {
-  const web3 = await getWeb3()
+  const web3 = getWeb3()
   return await web3.eth.getAccounts()
 }

@@ -92,6 +92,18 @@ contract('Rock Paper Scissors', accounts => {
     })
   })
 
+  describe('getBetValue()', () => {
+    it('should return bet value', async () => {
+      const rps = await Rps.new()
+      await rps.startGame(gameName('newGame'), shapeHash('rock', 'secret123'), {
+        from: accounts[0],
+        value: web3.toWei(0.1, 'ether')
+      })
+      const betValue = await rps.getBetValue(gameName('newGame'))
+      assert.equal(betValue.toNumber(), web3.toWei(0.1, 'ether'))
+    })
+  })
+
   describe('joinGame()', () => {
     it('should send transaction successfully', async () => {
       const rps = await Rps.new()

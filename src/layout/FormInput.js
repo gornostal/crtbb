@@ -11,6 +11,7 @@ const BootstrapFormInput = ({
   meta,
   onChange,
   type,
+  disabled,
   required,
   placeholder,
   addonBefore,
@@ -22,11 +23,23 @@ const BootstrapFormInput = ({
       {addonBefore || addonAfter ? (
         <InputGroup>
           {addonBefore && <InputGroup.Addon>{addonBefore}</InputGroup.Addon>}
-          <FormControl value={input.value} onChange={input.onChange} type={type} placeholder={placeholder} />
+          <FormControl
+            disabled={disabled}
+            value={input.value}
+            onChange={input.onChange}
+            type={type}
+            placeholder={placeholder}
+          />
           {addonAfter && <InputGroup.Addon>{addonAfter}</InputGroup.Addon>}
         </InputGroup>
       ) : (
-        <FormControl value={input.value} onChange={input.onChange} type={type} placeholder={placeholder} />
+        <FormControl
+          disabled={disabled}
+          value={input.value}
+          onChange={input.onChange}
+          type={type}
+          placeholder={placeholder}
+        />
       )}
       <FormControl.Feedback />
       <HelpBlock>{meta.error}</HelpBlock>

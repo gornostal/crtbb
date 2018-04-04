@@ -2,14 +2,16 @@ import React, { Component } from 'react'
 import { Alert, Button } from 'react-bootstrap'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
-import { reduxForm } from 'redux-form'
+import { reduxForm, getFormValues } from 'redux-form'
 import { withRouter } from 'react-router-dom'
+import { utils } from 'web3'
 
 import { FormInput, FormSelect } from '../layout/FormInput'
 import makeFormSubmitHandler from '../utils/makeFormSubmitHandler'
 import withAsyncData from '../utils/withAsyncData'
 
-import { getAccounts, startGame, joinGame } from './rpsApi'
+import { getAccounts, getBetValue, startGame, joinGame } from './rpsApi'
+import withGameStatus from './withGameStatus'
 import RpsInput from './RpsInput'
 
 class GameForm extends Component {
@@ -18,20 +20,34 @@ class GameForm extends Component {
     this.onSubmit = this.onSubmit.bind(this)
   }
 
-  componentDidMount() {
-    this.props.ethAccounts.load()
+  getGameName() {
+    return this.props.match.params.gameName
   }
 
-  async onSubmit(formData) {
+  componentDidMount() {
+    this.props.ethAccounts.load()
+    if (!this.props.newGame) {
+      this.props.betValue.load(this.getGameName())
+    }
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.submitSucceeded) {
+      newProps.refreshGameStatus()
+    }
+  }
+
+  onSubmit(formData) {
+    const gameName = this.getGameName()
     if (this.props.newGame) {
-      return await this.props.startGame(formData)
+      return this.props.startGame({ ...formData, gameName })
     } else {
-      return await this.props.joinGame(formData)
+      return this.props.joinGame({ ...formData, gameName, betWei: this.props.betWei })
     }
   }
 
   render() {
-    const { handleSubmit, submitting, submitSucceeded, ethAccounts } = this.props
+    const { handleSubmit, submitting, newGame, betValue, ethAccounts } = this.props
     const accountOptions = ethAccounts.data ? ethAccounts.data.map(i => ({ value: i, displayValue: i })) : []
     accountOptions.unshift({ value: '', displayValue: '(not selected)' })
     var error = this.props.error
@@ -40,6 +56,10 @@ class GameForm extends Component {
     }
     if (ethAccounts.data && ethAccounts.data.length === 0) {
       error = 'Could not load your accounts. Did you unlock Metamask?'
+    }
+    if (betValue.error) {
+      console.error('Could not load betValue', betValue.error)
+      error = 'Could not load bet value'
     }
 
     return (
@@ -50,21 +70,14 @@ class GameForm extends Component {
           </Alert>
         )}
 
-        {submitSucceeded && (
-          <Alert bsStyle="success">
-            <strong>Success!</strong>
-          </Alert>
-        )}
-
         <form className="form-horizontal" onSubmit={handleSubmit(this.onSubmit)}>
-          <FormInput name="gameName" type="text" placeholder="Choose a unique name for this game" label="Name" />
           <FormSelect
             name="fromAccount"
             label="Address"
             disabled={!ethAccounts.data || ethAccounts.data.length === 0}
             options={accountOptions}
           />
-          <FormInput name="bet" type="text" label="Your Bet" addonAfter="ETH" />
+          <FormInput name="bet" type="text" label="Your Bet" addonAfter="ETH" disabled={!newGame} />
           <RpsInput name="shape" />
           <div className="col-sm-offset-2">
             <Button className="btn-lg" bsStyle="success" type="submit" disabled={submitting}>
@@ -83,16 +96,28 @@ class GameForm extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  initialValues: {},
-  formValues: (state.form.rps && state.form.rps.values) || {},
-  startGame: makeFormSubmitHandler(startGame),
-  joinGame: makeFormSubmitHandler(joinGame)
-})
+const mapStateToProps = (state, ownProps) => {
+  var initialValues
+  var betWei = ''
+  if (ownProps.betValue.data) {
+    betWei = ownProps.betValue.data.toString()
+    initialValues = { bet: utils.fromWei(betWei, 'ether') }
+  }
+
+  return {
+    initialValues,
+    betWei,
+    formValues: getFormValues('JoinGameForm')(state),
+    startGame: makeFormSubmitHandler(startGame),
+    joinGame: makeFormSubmitHandler(joinGame)
+  }
+}
 
 export default compose(
   withRouter,
   withAsyncData('ethAccounts', getAccounts),
+  withAsyncData('betValue', getBetValue),
+  withGameStatus,
   connect(mapStateToProps),
-  reduxForm({ form: 'GameForm' })
+  reduxForm({ form: 'JoinGameForm' })
 )(GameForm)

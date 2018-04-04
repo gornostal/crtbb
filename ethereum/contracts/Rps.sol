@@ -19,7 +19,7 @@ contract Rps {
   }
 
   struct Game {
-    uint reward;
+    uint bet;
     address player1;
     address player2;
     Shape player1Shape;
@@ -43,10 +43,10 @@ contract Rps {
 
   function startGame(bytes32 gameName, bytes32 hash) public payable {
     // check if game with this name doesn't exist
-    require(games[gameName].reward == 0);
+    require(games[gameName].bet == 0);
     require(msg.value > 0);
 
-    games[gameName].reward = msg.value;
+    games[gameName].bet = msg.value;
     games[gameName].player1 = msg.sender;
     games[gameName].player1Hash = hash;
   }
@@ -57,10 +57,14 @@ contract Rps {
     // check if game is not played yet
     require(games[gameName].player2 == 0);
     require(games[gameName].player1 != msg.sender);
-    require(games[gameName].reward == msg.value);
+    require(games[gameName].bet == msg.value);
 
     games[gameName].player2 = msg.sender;
     games[gameName].player2Hash = hash;
+  }
+
+  function getBetValue(bytes32 gameName) public view returns(uint) {
+    return games[gameName].bet;
   }
 
   function getGameStatus(bytes32 gameName) public view returns(GameStatus) {
@@ -108,6 +112,15 @@ contract Rps {
     revert();
   }
 
+  function getWinnerAddress(bytes32 gameName) public view returns(address) {
+    GameStatus status = getGameStatus(gameName);
+    if (status == GameStatus.tie) {
+      return address(0);
+    }
+
+    return status == GameStatus.player1Won ? games[gameName].player1 : games[gameName].player1;
+  }
+
   function revealSecret(bytes32 gameName, Shape shape, bytes32 secret) public {
     require(getGameStatus(gameName) == GameStatus.revealing);
 
@@ -125,7 +138,7 @@ contract Rps {
   function getReward(bytes32 gameName) public {
     address player1 = games[gameName].player1;
     address player2 = games[gameName].player2;
-    uint reward = games[gameName].reward;
+    uint bet = games[gameName].bet;
 
     require(msg.sender == player1 || msg.sender == player2);
 
@@ -139,7 +152,7 @@ contract Rps {
         if (games[gameName].player1Rewarded) {
           revert();
         } else {
-          amount = status == GameStatus.player1Won ? reward * 2 : reward;
+          amount = status == GameStatus.player1Won ? bet * 2 : bet;
           msg.sender.transfer(amount);
           LogPay(msg.sender, amount);
           games[gameName].player1Rewarded = true;
@@ -151,7 +164,7 @@ contract Rps {
         if (games[gameName].player2Rewarded) {
           revert();
         } else {
-          amount = status == GameStatus.player2Won ? reward * 2 : reward;
+          amount = status == GameStatus.player2Won ? bet * 2 : bet;
           msg.sender.transfer(amount);
           games[gameName].player2Rewarded = true;
           LogPay(msg.sender, amount);
