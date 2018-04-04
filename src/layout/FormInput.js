@@ -11,10 +11,12 @@ const BootstrapFormInput = ({
   meta,
   onChange,
   type,
+  disabled,
   required,
   placeholder,
   addonBefore,
-  addonAfter
+  addonAfter,
+  comment
 }) => (
   <FormGroup validationState={meta.error && 'error'} className={required && 'required'}>
     <ControlLabel className="col-sm-2">{label}</ControlLabel>
@@ -22,14 +24,26 @@ const BootstrapFormInput = ({
       {addonBefore || addonAfter ? (
         <InputGroup>
           {addonBefore && <InputGroup.Addon>{addonBefore}</InputGroup.Addon>}
-          <FormControl value={input.value} onChange={input.onChange} type={type} placeholder={placeholder} />
+          <FormControl
+            disabled={disabled}
+            value={input.value}
+            onChange={input.onChange}
+            type={type}
+            placeholder={placeholder}
+          />
           {addonAfter && <InputGroup.Addon>{addonAfter}</InputGroup.Addon>}
         </InputGroup>
       ) : (
-        <FormControl value={input.value} onChange={input.onChange} type={type} placeholder={placeholder} />
+        <FormControl
+          disabled={disabled}
+          value={input.value}
+          onChange={input.onChange}
+          type={type}
+          placeholder={placeholder}
+        />
       )}
       <FormControl.Feedback />
-      <HelpBlock>{meta.error}</HelpBlock>
+      <HelpBlock>{meta.error || comment}</HelpBlock>
     </div>
   </FormGroup>
 )
@@ -48,7 +62,8 @@ const BootstrapFormSelect = ({
   select,
   disabled,
   blankOption,
-  required
+  required,
+  comment
 }) => (
   <FormGroup validationState={meta.error && 'error'} className={required && 'required'}>
     <ControlLabel className="col-sm-2">{label}</ControlLabel>
@@ -62,7 +77,7 @@ const BootstrapFormSelect = ({
         ))}
       </FormControl>
       <FormControl.Feedback />
-      <HelpBlock>{meta.error}</HelpBlock>
+      <HelpBlock>{meta.error || comment}</HelpBlock>
     </div>
   </FormGroup>
 )

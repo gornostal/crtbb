@@ -9,7 +9,7 @@ export default function withAsyncData(propName, asyncFn) {
       constructor(props) {
         super(props)
         this.load = this.load.bind(this)
-        this.state = { pending: true, error: null, data: null }
+        this.state = { pending: false, error: null, data: null }
       }
 
       async load(...args) {

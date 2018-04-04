@@ -1,6 +1,7 @@
+import { utils } from 'web3'
+import { SubmissionError } from 'redux-form'
 import getWeb3 from '../utils/getWeb3'
 import getRpsContract from './getRpsContract'
-import { SubmissionError } from 'redux-form'
 
 const shapes = {
   rock: '0',
@@ -17,13 +18,26 @@ export const GameStatus = {
   tie: 5
 }
 
-export const getGameStatus = async gameNameHex => {
+export const getGameStatus = async gameName => {
+  const gameNameHex = utils.utf8ToHex(gameName)
   const rps = await getRpsContract()
   return await rps.getGameStatus(gameNameHex)
 }
 
+export const getWinnerAddress = async gameName => {
+  const gameNameHex = utils.utf8ToHex(gameName)
+  const rps = await getRpsContract()
+  return await rps.getWinnerAddress(gameNameHex)
+}
+
+export const getBetValue = async gameName => {
+  const gameNameHex = utils.utf8ToHex(gameName)
+  const rps = await getRpsContract()
+  return await rps.getBetValue(gameNameHex)
+}
+
 export const getAccounts = async () => {
-  const web3 = await getWeb3()
+  const web3 = getWeb3()
   return await web3.eth.getAccounts()
 }
 
@@ -49,10 +63,8 @@ export const startGame = async formData => {
     throw new SubmissionError({ ...errors, _error: 'Please fix the errors' })
   }
 
-  const web3 = await getWeb3()
-  const gameNameHex = web3.utils.utf8ToHex(formData.gameName)
-  const status = (await getGameStatus(gameNameHex)).toNumber()
-  console.log('status', status)
+  const gameNameHex = utils.utf8ToHex(formData.gameName)
+  const status = (await getGameStatus(formData.gameName)).toNumber()
   if (status !== GameStatus.notStarted) {
     throw new SubmissionError({
       gameName: 'This game name was already used. Please choose another one',
@@ -61,11 +73,11 @@ export const startGame = async formData => {
   }
 
   const rps = await getRpsContract()
-  const secret = await getOrGenerateRandomSecret(formData.gameName)
-  const hash = await shapeHash(formData.shape, secret)
+  const { secret } = gameParameters.save(formData.gameName, formData.fromAccount, formData.shape)
+  const hash = shapeHash(formData.shape, secret)
   const tx = await rps.startGame(gameNameHex, hash, {
     from: formData.fromAccount,
-    value: web3.utils.toWei(formData.bet, 'ether')
+    value: utils.toWei(formData.bet, 'ether')
   })
   if (parseInt(tx.receipt.status, 16) !== 1) {
     console.log('tx', tx)
@@ -73,21 +85,104 @@ export const startGame = async formData => {
   }
 }
 
-export const joinGame = async () => {}
+export const joinGame = async formData => {
+  const errors = {}
+  if (!formData.fromAccount) {
+    errors.fromAccount = 'Select your account'
+  }
+  if (['rock', 'paper', 'scissors'].indexOf(formData.shape) === -1) {
+    errors.shape = 'Please pick a hand shape'
+  }
 
-async function shapeHash(shape, secret) {
-  const web3 = await getWeb3()
-  return web3.utils.soliditySha3({ t: 'uint8', v: shapes[shape] }, { t: 'bytes32', v: secret })
+  if (Object.keys(errors).length > 0) {
+    throw new SubmissionError({ ...errors, _error: 'Please fix the errors' })
+  }
+
+  const status = (await getGameStatus(formData.gameName)).toNumber()
+  if (status !== GameStatus.choosing) {
+    throw new SubmissionError({
+      gameName: 'This game cannot be joined'
+    })
+  }
+
+  const gameNameHex = utils.utf8ToHex(formData.gameName)
+  const rps = await getRpsContract()
+  const { secret } = gameParameters.save(formData.gameName, formData.fromAccount, formData.shape)
+  const hash = shapeHash(formData.shape, secret)
+  const tx = await rps.joinGame(gameNameHex, hash, {
+    from: formData.fromAccount,
+    value: formData.betWei
+  })
+  if (parseInt(tx.receipt.status, 16) !== 1) {
+    console.log('tx', tx)
+    throw new SubmissionError({ _error: 'Transaction error. Check the logs' })
+  }
 }
 
-async function getOrGenerateRandomSecret(gameName) {
-  const web3 = await getWeb3()
-  const storageKey = `game-secret-${gameName}`
-  if (localStorage.getItem(storageKey)) {
-    return localStorage.getItem(storageKey)
-  } else {
-    const secret = web3.utils.randomHex(32)
-    localStorage.setItem(storageKey, secret)
-    return secret
+export const getReward = async gameName => {
+  const { account } = gameParameters.get(gameName)
+  const gameNameHex = utils.utf8ToHex(gameName)
+  const rps = await getRpsContract()
+  const tx = await rps.getReward(gameNameHex, { from: account })
+  if (parseInt(tx.receipt.status, 16) !== 1) {
+    console.log('tx', tx)
+    throw new Error('Transaction error. Check the logs')
+  }
+  gameParameters.update(gameName, { rewarded: true })
+  return true
+}
+
+export const revealShape = async gameName => {
+  const { secret, account, shape } = gameParameters.get(gameName)
+  const gameNameHex = utils.utf8ToHex(gameName)
+  const rps = await getRpsContract()
+  const tx = await rps.revealSecret(gameNameHex, shapes[shape], secret, { from: account })
+  if (parseInt(tx.receipt.status, 16) !== 1) {
+    console.log('tx', tx)
+    throw new Error('Transaction error. Check the logs')
+  }
+  gameParameters.update(gameName, { revealed: true })
+  return true
+}
+
+function shapeHash(shape, secret) {
+  return utils.soliditySha3({ t: 'uint8', v: shapes[shape] }, { t: 'bytes32', v: secret })
+}
+
+export const gameParameters = {
+  save(gameName, account, shape) {
+    const storageKey = `game-secret-${gameName}`
+    const data = {
+      secret: utils.randomHex(32),
+      account,
+      shape,
+      revealed: false,
+      rewarded: false
+    }
+    localStorage.setItem(storageKey, JSON.stringify(data))
+    return data
+  },
+  get(gameName) {
+    const storageKey = `game-secret-${gameName}`
+    if (!localStorage.getItem(storageKey)) {
+      return
+    }
+
+    return JSON.parse(localStorage.getItem(storageKey))
+  },
+  update(gameName, updates) {
+    const params = gameParameters.get(gameName)
+    if (!params) {
+      throw new Error('Invalid game name')
+    }
+
+    const newParams = { ...params, ...updates }
+    const storageKey = `game-secret-${gameName}`
+    localStorage.setItem(storageKey, JSON.stringify(newParams))
+    return newParams
+  },
+  remove(gameName) {
+    const storageKey = `game-secret-${gameName}`
+    localStorage.removeItem(storageKey)
   }
 }
