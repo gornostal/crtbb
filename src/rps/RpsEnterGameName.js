@@ -24,7 +24,7 @@ class RpsEnterGameName extends Component {
 
     return (
       <div>
-        <h2>Step 1 of 4. Enter Game Name</h2>
+        <h2>Step 0 of 3. Enter Game Name</h2>
         <form onSubmit={this.onSubmit}>
           <FormControl
             autoFocus
